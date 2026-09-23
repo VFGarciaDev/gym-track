@@ -1,18 +1,21 @@
 {
   "name": "gym-track",
   "version": "1.0.0",
+  "private": true,
   "main": "expo-router/entry",
   "scripts": {
-    "start": "expo start --dev-client",
-    "ios": "expo run:ios",
-    "android": "expo run:android",
-    "build:dev": "eas build --profile development",
-    "build:preview": "eas build --profile preview",
-    "build:prod": "eas build --profile production",
+    "start": "expo start -c",
     "prebuild": "expo prebuild",
-    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
-    "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "web": "expo start --web"
+    "build:dev": "eas build --profile development",
+    "build:prev": "eas build --profile preview",
+    "build:prod": "eas build --profile production",
+    "update:dev": "eas update --channel development --environment development",
+    "update:prev": "eas update --channel preview --environment preview",
+    "update:prod": "eas update --channel production --environment production",
+    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
+    "lint:fix": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check"
   },
   "dependencies": {
     "@expo/html-elements": "^0.12.5",
@@ -54,23 +57,21 @@
     "zustand": "^4.5.1"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^9.5.1",
     "@babel/core": "^7.20.0",
+    "@eslint-react/eslint-plugin": "^5.18.6",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/react": "~19.2.2",
     "babel-plugin-module-resolver": "^5.0.0",
     "eslint": "^9.25.1",
     "eslint-config-expo": "~56.0.4",
     "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-react-refresh": "^0.5.5",
     "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.11",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.2.0",
-    "typescript": "~6.0.3",
-    "@antfu/eslint-config": "^9.5.1",
-    "eslint-plugin-format": "^2.0.1",
-    "@eslint-react/eslint-plugin": "^5.18.6",
-    "eslint-plugin-react-refresh": "^0.5.5"
+    "typescript": "~6.0.3"
   },
-  "private": true,
   "overrides": {
     "lightningcss": "1.30.1"
   },
