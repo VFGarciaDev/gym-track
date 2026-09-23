@@ -8,5 +8,6 @@ export default {
   tabWidth: 2,
   tailwindAttributes: ["className"],
   tailwindStylesheet: "./src/styles/global.css",
+  tailwindFunctions: ["tva"],
   trailingComma: "none"
 }
