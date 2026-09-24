@@ -66,5 +66,15 @@ export default antfu(
       "unused-imports/no-unused-vars": ["off"]
     }
   },
+  {
+    files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: {
+      "react/no-forward-ref": ["off"],
+      "react/no-children-map": ["off"],
+      "react/no-clone-element": ["off"],
+      "react/no-context-provider": ["off"],
+      "ts/no-explicit-any": ["off"]
+    }
+  },
   prettierConflicts
 )
