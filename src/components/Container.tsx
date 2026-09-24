@@ -19,7 +19,7 @@ export function Container({
 }: ContainerProps) {
   const paddingSize = {
     none: "",
-    default: "px-6"
+    default: "px-6 py-4"
   }
 
   return (
@@ -29,7 +29,11 @@ export function Container({
           bounces={false}
           overScrollMode="never"
           showsVerticalScrollIndicator={false}
-          contentContainerClassName={cn(paddingSize[padding], contentContainerClassName)}
+          contentContainerClassName={cn(
+            "flex-1 bg-background",
+            paddingSize[padding],
+            contentContainerClassName
+          )}
           {...props}
         >
           {children}
