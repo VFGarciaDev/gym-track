@@ -52,8 +52,8 @@ function InitialLayout() {
       </Stack.Protected>
 
       <Stack.Protected guard={!isAuthenticated}>
-        <Stack.Screen name="(auth)/login" />
         <Stack.Screen name="(auth)/forgot-password" />
+        <Stack.Screen name="(auth)/sign-in" />
       </Stack.Protected>
     </Stack>
   )
