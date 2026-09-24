@@ -5,6 +5,7 @@ import { OverlayProvider } from "@gluestack-ui/core/overlay/creator"
 import { ToastProvider } from "@gluestack-ui/core/toast/creator"
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { Appearance, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 type Theme = "light" | "dark"
 
@@ -23,7 +24,7 @@ const initialThemeContext: ThemeContextProps = {
 const ThemeContext = createContext<ThemeContextProps>(initialThemeContext)
 
 export default function ThemeProvider({ children }: PropsWithChildren) {
-  const [theme, setTheme] = useState<Theme>("light")
+  const [theme, setTheme] = useState<Theme>("dark")
   const isDarkMode = theme === "dark"
 
   const toggleTheme = useCallback(
@@ -52,10 +53,12 @@ export default function ThemeProvider({ children }: PropsWithChildren) {
 
   return (
     <ThemeContext value={contextValue}>
-      <View className="flex-1 bg-background">
-        <OverlayProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </OverlayProvider>
+      <View style={{ flex: 1, height: "100%", width: "100%" }} className="bg-background">
+        <SafeAreaView style={{ flex: 1 }}>
+          <OverlayProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </OverlayProvider>
+        </SafeAreaView>
       </View>
     </ThemeContext>
   )
