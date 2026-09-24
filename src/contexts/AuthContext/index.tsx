@@ -1,14 +1,26 @@
 import type { UserSignInType } from "@/api/auth/fetch-user-session/schema"
 import type { PropsWithChildren } from "react"
 
+import axios from "axios"
 import { createContext, useCallback, useContext, useMemo, useRef } from "react"
 
 import { fetchUserSession } from "@/api/auth/fetch-user-session"
+import { InvalidCredentialsError } from "@/lib/errors/InvalidCredentialsError"
 import { useUserSession, waitForUserSessionHydration } from "@/store/user-session"
+
+export type SignInResponse =
+  | { status: "success" }
+  | {
+      status: "error"
+      error: {
+        code: "invalid_credentials" | "network" | "unexpected"
+        message: string
+      }
+    }
 
 type AuthContextProps = {
   isAuthenticated?: boolean
-  signIn: (credentials: UserSignInType) => Promise<void>
+  signIn: (credentials: UserSignInType) => Promise<SignInResponse>
   signOut: () => Promise<void>
 }
 
@@ -22,15 +34,31 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   const operationIdRef = useRef(0)
 
   const signIn = useCallback(
-    async (credentials: UserSignInType) => {
+    async (credentials: UserSignInType): Promise<SignInResponse> => {
       const currentOperationId = ++operationIdRef.current
 
-      await waitForUserSessionHydration()
-      const session = await fetchUserSession(credentials)
+      try {
+        await waitForUserSessionHydration()
+        const session = await fetchUserSession(credentials)
 
-      if (currentOperationId !== operationIdRef.current) return
+        if (currentOperationId !== operationIdRef.current) {
+          return createSignInError("unexpected", "A tentativa de login foi cancelada.")
+        }
 
-      setSession(session)
+        setSession(session)
+
+        return { status: "success" }
+      } catch (error) {
+        if (error instanceof InvalidCredentialsError) {
+          return createSignInError("invalid_credentials", error.message)
+        }
+
+        if (axios.isAxiosError(error)) {
+          return createSignInError("network", "Não foi possível conectar ao servidor.")
+        }
+
+        return createSignInError("unexpected", "Ocorreu um erro inesperado. Tente novamente.")
+      }
     },
     [setSession]
   )
@@ -62,4 +90,11 @@ export function useAuth() {
   }
 
   return context
+}
+
+function createSignInError(
+  code: "invalid_credentials" | "network" | "unexpected",
+  message: string
+): SignInResponse {
+  return { status: "error", error: { code, message } }
 }

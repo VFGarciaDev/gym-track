@@ -1,7 +1,10 @@
 import type { UserSession } from "@/types/user-session"
 import type { ReactElement } from "react"
 
+import { AxiosError } from "axios"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+
+import { InvalidCredentialsError } from "@/lib/errors/InvalidCredentialsError"
 
 import AuthProvider from "."
 
@@ -36,7 +39,16 @@ const session: UserSession = {
 
 type ContextValue = {
   isAuthenticated: boolean | undefined
-  signIn: (value: typeof credentials) => Promise<void>
+  signIn: (value: typeof credentials) => Promise<
+    | { status: "success" }
+    | {
+        status: "error"
+        error: {
+          code: "invalid_credentials" | "network" | "unexpected"
+          message: string
+        }
+      }
+  >
   signOut: () => Promise<void>
 }
 
@@ -106,9 +118,54 @@ describe("auth provider", () => {
       return session
     })
 
-    await renderAuthProvider(state).signIn(credentials)
+    const result = await renderAuthProvider(state).signIn(credentials)
 
     expect(events).toEqual(["hydrated", "fetched", "persisted"])
+    expect(result).toEqual({ status: "success" })
+  })
+
+  it("returns an invalid credentials result", async () => {
+    dependencies.fetchUserSession.mockRejectedValue(new InvalidCredentialsError())
+
+    const result = await renderAuthProvider(createStoreState()).signIn(credentials)
+
+    expect(result).toEqual({
+      status: "error",
+      error: {
+        code: "invalid_credentials",
+        message: "Usuário ou senha inválidos."
+      }
+    })
+  })
+
+  it("returns a network error result", async () => {
+    dependencies.fetchUserSession.mockRejectedValue(
+      new AxiosError("Network Error", "ERR_NETWORK")
+    )
+
+    const result = await renderAuthProvider(createStoreState()).signIn(credentials)
+
+    expect(result).toEqual({
+      status: "error",
+      error: {
+        code: "network",
+        message: "Não foi possível conectar ao servidor."
+      }
+    })
+  })
+
+  it("returns an unexpected error result", async () => {
+    dependencies.fetchUserSession.mockRejectedValue(new Error("boom"))
+
+    const result = await renderAuthProvider(createStoreState()).signIn(credentials)
+
+    expect(result).toEqual({
+      status: "error",
+      error: {
+        code: "unexpected",
+        message: "Ocorreu um erro inesperado. Tente novamente."
+      }
+    })
   })
 
   it("waits for hydration and removes the persisted session on sign out", async () => {
