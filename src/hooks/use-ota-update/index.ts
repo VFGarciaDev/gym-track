@@ -8,7 +8,7 @@ import {
   initialOTAUpdateState,
   OTA_UPDATE_AUTO_CONTINUE_SECONDS,
   otaUpdateReducer,
-  toProgressPercentage,
+  toProgressPercentage
 } from "./ota-update-state"
 
 void SplashScreen.preventAutoHideAsync().catch((error: unknown) => {
@@ -17,24 +17,19 @@ void SplashScreen.preventAutoHideAsync().catch((error: unknown) => {
 
 SplashScreen.setOptions({
   duration: 300,
-  fade: true,
+  fade: true
 })
 
-const otaMockScenario = resolveOTAMockScenario(
-  process.env.EXPO_PUBLIC_OTA_MOCK_SCENARIO,
-  __DEV__,
-)
+const otaMockScenario = resolveOTAMockScenario(process.env.EXPO_PUBLIC_OTA_MOCK_SCENARIO, __DEV__)
 
 export function useOTAUpdate() {
   const { downloadProgress } = Updates.useUpdates()
   const [state, dispatch] = useReducer(otaUpdateReducer, initialOTAUpdateState)
   const [mockDownloadProgress, setMockDownloadProgress] = useState(0)
-  const [secondsUntilContinue, setSecondsUntilContinue] = useState(
-    OTA_UPDATE_AUTO_CONTINUE_SECONDS,
-  )
+  const [secondsUntilContinue, setSecondsUntilContinue] = useState(OTA_UPDATE_AUTO_CONTINUE_SECONDS)
   const activeAttemptIdRef = useRef(0)
   const hasStartedRef = useRef(false)
-  const hasHiddenSplashRef = useRef(false)
+  const splashVisibilityRef = useRef<"visible" | "hiding" | "hidden">("visible")
 
   const runAttempt = useCallback(async (attemptId: number) => {
     if (!otaMockScenario && (__DEV__ || !Updates.isEnabled)) {
@@ -49,29 +44,48 @@ export function useOTAUpdate() {
         if (attemptId !== activeAttemptIdRef.current) return
 
         dispatch({
-          type: phase === "downloading" ? "update-found" : "restart-started",
+          type: phase === "downloading" ? "update-found" : "restart-started"
         })
       }
       const result = otaMockScenario
         ? await runMockOTAUpdateAttempt({
             attempt: attemptId,
             onPhaseChange: handlePhaseChange,
-            onProgress: progress => {
+            onProgress: (progress) => {
               if (attemptId === activeAttemptIdRef.current) {
                 setMockDownloadProgress(progress)
               }
             },
             scenario: otaMockScenario,
-            wait: durationMs =>
-              new Promise(resolve => setTimeout(resolve, durationMs)),
+            wait: (durationMs) => new Promise((resolve) => setTimeout(resolve, durationMs))
           })
         : await runOTAUpdateAttempt(
             {
-              checkForUpdate: Updates.checkForUpdateAsync,
-              fetchUpdate: Updates.fetchUpdateAsync,
-              reload: () => Updates.reloadAsync(),
+              checkForUpdate: async () => {
+                const update = await Updates.checkForUpdateAsync()
+
+                if (attemptId !== activeAttemptIdRef.current) {
+                  return { isAvailable: false, isRollBackToEmbedded: false }
+                }
+
+                return update
+              },
+              fetchUpdate: async () => {
+                const update = await Updates.fetchUpdateAsync()
+
+                if (attemptId !== activeAttemptIdRef.current) {
+                  return { isNew: false, isRollBackToEmbedded: false }
+                }
+
+                return update
+              },
+              reload: async () => {
+                if (attemptId !== activeAttemptIdRef.current) return
+
+                await Updates.reloadAsync()
+              }
             },
-            handlePhaseChange,
+            handlePhaseChange
           )
 
       if (result === "ready" && attemptId === activeAttemptIdRef.current) {
@@ -83,7 +97,7 @@ export function useOTAUpdate() {
       console.error("Falha ao atualizar o aplicativo", error)
       dispatch({
         error: error instanceof Error ? error.message : String(error),
-        type: "failed",
+        type: "failed"
       })
     }
   }, [])
@@ -106,12 +120,17 @@ export function useOTAUpdate() {
   }, [startAttempt])
 
   const hideNativeSplash = useCallback(() => {
-    if (hasHiddenSplashRef.current) return
+    if (splashVisibilityRef.current !== "visible") return
 
-    hasHiddenSplashRef.current = true
-    void SplashScreen.hideAsync().catch((error: unknown) => {
-      console.error("Não foi possível ocultar a splash", error)
-    })
+    splashVisibilityRef.current = "hiding"
+    void SplashScreen.hideAsync()
+      .then(() => {
+        splashVisibilityRef.current = "hidden"
+      })
+      .catch((error: unknown) => {
+        splashVisibilityRef.current = "visible"
+        console.error("Não foi possível ocultar a splash", error)
+      })
   }, [])
 
   useEffect(() => {
@@ -125,11 +144,11 @@ export function useOTAUpdate() {
     if (state.phase !== "failed") return
 
     const countdownInterval = setInterval(() => {
-      setSecondsUntilContinue(currentValue => Math.max(0, currentValue - 1))
+      setSecondsUntilContinue((currentValue) => Math.max(0, currentValue - 1))
     }, 1000)
     const continueTimeout = setTimeout(
       continueWithInstalledVersion,
-      OTA_UPDATE_AUTO_CONTINUE_SECONDS * 1000,
+      OTA_UPDATE_AUTO_CONTINUE_SECONDS * 1000
     )
 
     return () => {
@@ -143,10 +162,8 @@ export function useOTAUpdate() {
     error: state.error,
     hideNativeSplash,
     phase: state.phase,
-    progress: toProgressPercentage(
-      otaMockScenario ? mockDownloadProgress : downloadProgress,
-    ),
+    progress: toProgressPercentage(otaMockScenario ? mockDownloadProgress : downloadProgress),
     retry,
-    secondsUntilContinue,
+    secondsUntilContinue
   }
 }

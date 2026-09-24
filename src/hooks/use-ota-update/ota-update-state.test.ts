@@ -1,85 +1,76 @@
-import assert from "node:assert/strict"
-// eslint-disable-next-line test/no-import-node-test -- this project uses Node's dependency-free runner
-import test from "node:test"
+import { assert, expect, it } from "vitest"
 
-import {
-  initialOTAUpdateState,
-  otaUpdateReducer,
-  toProgressPercentage,
-} from "./ota-update-state.ts"
-import {
-  resolveOTAMockScenario,
-  runMockOTAUpdateAttempt,
-} from "./ota-update-mock.ts"
-import { runOTAUpdateAttempt } from "./ota-update-runner.ts"
+import { resolveOTAMockScenario, runMockOTAUpdateAttempt } from "./ota-update-mock"
+import { runOTAUpdateAttempt } from "./ota-update-runner"
+import { initialOTAUpdateState, otaUpdateReducer, toProgressPercentage } from "./ota-update-state"
 
-test("moves from checking to downloading", () => {
+it("moves from checking to downloading", () => {
   const state = otaUpdateReducer(initialOTAUpdateState, { type: "update-found" })
 
   assert.deepEqual(state, {
     attempt: 1,
     error: null,
-    phase: "downloading",
+    phase: "downloading"
   })
 })
 
-test("moves from downloading to restarting", () => {
+it("moves from downloading to restarting", () => {
   const downloading = otaUpdateReducer(initialOTAUpdateState, { type: "update-found" })
   const state = otaUpdateReducer(downloading, { type: "restart-started" })
 
   assert.deepEqual(state, {
     attempt: 1,
     error: null,
-    phase: "restarting",
+    phase: "restarting"
   })
 })
 
-test("records a failed first attempt", () => {
+it("records a failed first attempt", () => {
   const state = otaUpdateReducer(initialOTAUpdateState, {
     error: "offline",
-    type: "failed",
+    type: "failed"
   })
 
   assert.deepEqual(state, {
     attempt: 1,
     error: "offline",
-    phase: "failed",
+    phase: "failed"
   })
 })
 
-test("starts a clean second attempt after retry", () => {
+it("starts a clean second attempt after retry", () => {
   const failed = otaUpdateReducer(initialOTAUpdateState, {
     error: "offline",
-    type: "failed",
+    type: "failed"
   })
   const state = otaUpdateReducer(failed, { type: "retry" })
 
   assert.deepEqual(state, {
     attempt: 2,
     error: null,
-    phase: "checking",
+    phase: "checking"
   })
 })
 
-test("continues with the installed version", () => {
+it("continues with the installed version", () => {
   const state = otaUpdateReducer(initialOTAUpdateState, { type: "continue" })
 
   assert.deepEqual(state, {
     attempt: 1,
     error: null,
-    phase: "ready",
+    phase: "ready"
   })
 })
 
-test("normalizes native progress to an integer percentage", () => {
+it("normalizes native progress to an integer percentage", () => {
   assert.equal(toProgressPercentage(undefined), 0)
   assert.equal(toProgressPercentage(-1), 0)
   assert.equal(toProgressPercentage(0.684), 68)
   assert.equal(toProgressPercentage(2), 100)
 })
 
-test("finishes without downloading when no update is available", async () => {
-  const calls = []
+it("finishes without downloading when no update is available", async () => {
+  const calls: string[] = []
 
   const result = await runOTAUpdateAttempt(
     {
@@ -93,17 +84,17 @@ test("finishes without downloading when no update is available", async () => {
       },
       reload: async () => {
         calls.push("reload")
-      },
+      }
     },
-    (phase) => calls.push(phase),
+    (phase) => calls.push(phase)
   )
 
   assert.equal(result, "ready")
   assert.deepEqual(calls, ["check"])
 })
 
-test("downloads and reloads a new update", async () => {
-  const calls = []
+it("downloads and reloads a new update", async () => {
+  const calls: string[] = []
 
   const result = await runOTAUpdateAttempt(
     {
@@ -117,43 +108,43 @@ test("downloads and reloads a new update", async () => {
       },
       reload: async () => {
         calls.push("reload")
-      },
+      }
     },
-    (phase) => calls.push(phase),
+    (phase) => calls.push(phase)
   )
 
   assert.equal(result, "restarting")
   assert.deepEqual(calls, ["check", "downloading", "fetch", "restarting", "reload"])
 })
 
-test("applies a rollback directive", async () => {
-  const calls = []
+it("applies a rollback directive", async () => {
+  const calls: string[] = []
 
   const result = await runOTAUpdateAttempt(
     {
       checkForUpdate: async () => ({
         isAvailable: false,
-        isRollBackToEmbedded: true,
+        isRollBackToEmbedded: true
       }),
       fetchUpdate: async () => ({
         isNew: false,
-        isRollBackToEmbedded: true,
+        isRollBackToEmbedded: true
       }),
       reload: async () => {
         calls.push("reload")
-      },
+      }
     },
-    (phase) => calls.push(phase),
+    (phase) => calls.push(phase)
   )
 
   assert.equal(result, "restarting")
   assert.deepEqual(calls, ["downloading", "restarting", "reload"])
 })
 
-test("propagates update errors to the caller", async () => {
+it("propagates update errors to the caller", async () => {
   const updateError = new Error("offline")
 
-  await assert.rejects(
+  await expect(
     runOTAUpdateAttempt(
       {
         checkForUpdate: async () => {
@@ -161,81 +152,82 @@ test("propagates update errors to the caller", async () => {
         },
         fetchUpdate: async () => ({
           isNew: false,
-          isRollBackToEmbedded: false,
+          isRollBackToEmbedded: false
         }),
-        reload: async () => undefined,
+        reload: async () => undefined
       },
-      () => undefined,
-    ),
-    updateError,
-  )
+      () => undefined
+    )
+  ).rejects.toBe(updateError)
 })
 
-test("enables a valid mock scenario only in development", () => {
+it("enables a valid mock scenario only in development", () => {
   assert.equal(resolveOTAMockScenario("success", true), "success")
   assert.equal(resolveOTAMockScenario("success", false), null)
   assert.equal(resolveOTAMockScenario("invalid", true), null)
   assert.equal(resolveOTAMockScenario(undefined, true), null)
 })
 
-test("simulates a successful progressive download", async () => {
-  const phases = []
-  const progressValues = []
+it("simulates a successful progressive download", async () => {
+  const phases: string[] = []
+  const progressValues: number[] = []
 
   const result = await runMockOTAUpdateAttempt({
     attempt: 1,
-    onPhaseChange: phase => phases.push(phase),
-    onProgress: progress => progressValues.push(progress),
+    onPhaseChange: (phase) => phases.push(phase),
+    onProgress: (progress) => progressValues.push(progress),
     scenario: "success",
-    wait: async () => undefined,
+    wait: async () => undefined
   })
 
   assert.equal(result, "ready")
   assert.deepEqual(phases, ["downloading", "restarting"])
   assert.equal(progressValues[0], 0)
   assert.equal(progressValues.at(-1), 1)
-  assert.ok(progressValues.every((value, index) => index === 0 || value >= progressValues[index - 1]))
+  assert.ok(
+    progressValues.every((value, index) => index === 0 || value >= progressValues[index - 1])
+  )
 })
 
-test("always-error fails every download attempt", async () => {
+it("always-error fails every download attempt", async () => {
   for (const attempt of [1, 2]) {
-    const progressValues = []
+    const progressValues: number[] = []
 
-    await assert.rejects(
+    await expect(
       runMockOTAUpdateAttempt({
         attempt,
         onPhaseChange: () => undefined,
-        onProgress: progress => progressValues.push(progress),
+        onProgress: (progress) => progressValues.push(progress),
         scenario: "always-error",
-        wait: async () => undefined,
-      }),
-    )
+        wait: async () => undefined
+      })
+    ).rejects.toThrow("Falha simulada no download do update")
 
     assert.equal(progressValues.at(-1), 0.45)
   }
 })
 
-test("fail-once succeeds on the second attempt", async () => {
-  const firstProgressValues = []
+it("fail-once succeeds on the second attempt", async () => {
+  const firstProgressValues: number[] = []
 
-  await assert.rejects(
+  await expect(
     runMockOTAUpdateAttempt({
       attempt: 1,
       onPhaseChange: () => undefined,
-      onProgress: progress => firstProgressValues.push(progress),
+      onProgress: (progress) => firstProgressValues.push(progress),
       scenario: "fail-once",
-      wait: async () => undefined,
-    }),
-  )
+      wait: async () => undefined
+    })
+  ).rejects.toThrow("Falha simulada no download do update")
 
-  const secondPhases = []
-  const secondProgressValues = []
+  const secondPhases: string[] = []
+  const secondProgressValues: number[] = []
   const result = await runMockOTAUpdateAttempt({
     attempt: 2,
-    onPhaseChange: phase => secondPhases.push(phase),
-    onProgress: progress => secondProgressValues.push(progress),
+    onPhaseChange: (phase) => secondPhases.push(phase),
+    onProgress: (progress) => secondProgressValues.push(progress),
     scenario: "fail-once",
-    wait: async () => undefined,
+    wait: async () => undefined
   })
 
   assert.equal(firstProgressValues.at(-1), 0.45)
