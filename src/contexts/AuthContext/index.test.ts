@@ -3,7 +3,7 @@ import type { ReactElement } from "react"
 
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import AuthProvider from "./AuthContext"
+import AuthProvider from "."
 
 const dependencies = vi.hoisted(() => ({
   fetchUserSession: vi.fn(),
