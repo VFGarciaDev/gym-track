@@ -10,22 +10,20 @@ import { useOTAUpdate } from "@/hooks/use-ota-update"
 
 export default function RootLayout() {
   const {
-    continueWithInstalledVersion,
-    hideNativeSplash,
     phase,
-    progress,
     retry,
-    secondsUntilContinue
+    progress,
+    hideNativeSplash,
+    secondsUntilContinue,
+    continueWithInstalledVersion
   } = useOTAUpdate()
 
   return (
     <GestureHandlerRootView onLayout={hideNativeSplash} style={{ flex: 1 }}>
+      <Toast swipeable={false} />
       <AppProviders>
         {phase === "ready" ? (
-          <>
-            <InitialLayout />
-            <Toast topOffset={100} swipeable={false} />
-          </>
+          <InitialLayout />
         ) : (
           <OTAUpdateScreen
             phase={phase}
