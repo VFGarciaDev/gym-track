@@ -6,9 +6,10 @@ export default function AppLayout() {
   const { isAuthenticated } = useAuth()
 
   if (!isAuthenticated) return <Redirect href="/sign-in" />
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="home" />
+      <Stack.Screen name="index" />
     </Stack>
   )
 }

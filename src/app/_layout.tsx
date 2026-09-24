@@ -1,7 +1,6 @@
 import "@/styles/global.css"
-import { Stack, useRouter } from "expo-router"
+import { Stack } from "expo-router"
 import { StatusBar } from "expo-status-bar"
-import { useEffect } from "react"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import Toast from "react-native-toast-message"
 
@@ -43,16 +42,6 @@ export default function RootLayout() {
 
 function InitialLayout() {
   const { isAuthenticated } = useAuth()
-  // const router = useRouter()
-
-  useEffect(() => {
-    // if (isAuthenticated === undefined) return
-    // if (isAuthenticated) {
-    //   return router.replace("/(app)/home")
-    // } else {
-    //   return router.replace("/sign-in")
-    // }
-  }, [isAuthenticated])
 
   if (isAuthenticated === undefined) return null
 
