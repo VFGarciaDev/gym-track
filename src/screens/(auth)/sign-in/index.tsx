@@ -8,13 +8,11 @@ import Toast from "react-native-toast-message"
 
 import { userSignInSchema } from "@/api/auth/fetch-user-session/schema"
 import { Container } from "@/components/Container"
-import {
-  Button,
-  ButtonText,
-} from "@/components/ui"
+import { Button, ButtonText, Text } from "@/components/ui"
 import { useAuth } from "@/contexts/AuthContext"
 
 import { SignInFormControl } from "./components/SignInFormControl"
+import { View } from "react-native"
 
 export function SignInContent() {
   const { signIn } = useAuth()
@@ -58,50 +56,61 @@ export function SignInContent() {
   }
 
   return (
-    <Container>
-      <Controller
-        control={control}
-        name="username"
-        render={({ field: { onChange, value } }) => {
-          const isError = !!errors.username
+    <Container contentContainerClassName="justify-center">
+      <View className="mb-10 items-center gap-2">
+        <Text className="text-3xl font-bold">Bem-Vindo</Text>
+        <Text className="text-lg text-muted-foreground">Entre para acompanhar seus treinos</Text>
+      </View>
 
-          return (
-            <SignInFormControl
-              label="Usuário"
-              icon={UserRound}
-              value={value}
-              placeholder="usuário"
-              onChangeText={onChange}
-              isError={isError}
-              errorMsg={errors.username?.message}
-            />
-          )
-        }}
-      />
+      <View className="mb-16 gap-5">
+        <Controller
+          control={control}
+          name="username"
+          render={({ field: { onChange, value } }) => {
+            const isError = !!errors.username
 
-      <Controller
-        control={control}
-        name="password"
-        render={({ field: { onChange, value } }) => {
-          const isError = !!errors.password
+            return (
+              <SignInFormControl
+                label="Usuário"
+                icon={UserRound}
+                value={value}
+                placeholder="usuário"
+                onChangeText={onChange}
+                isError={isError}
+                errorMsg={errors.username?.message}
+              />
+            )
+          }}
+        />
 
-          return (
-            <SignInFormControl
-              label="Senha"
-              icon={LockKeyhole}
-              value={value}
-              type="password"
-              placeholder="senha"
-              onChangeText={onChange}
-              isError={isError}
-              errorMsg={errors.password?.message}
-            />
-          )
-        }}
-      />
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, value } }) => {
+            const isError = !!errors.password
 
-      <Button onPress={handleSubmit(onSubmit)} isDisabled={isSubmitting}>
-        <ButtonText>Entrar</ButtonText>
+            return (
+              <SignInFormControl
+                isPassword
+                label="Senha"
+                icon={LockKeyhole}
+                value={value}
+                placeholder="senha"
+                onChangeText={onChange}
+                isError={isError}
+                errorMsg={errors.password?.message}
+              />
+            )
+          }}
+        />
+      </View>
+
+      <Button
+        onPress={handleSubmit(onSubmit)}
+        isDisabled={isSubmitting}
+        className="rounded-xl py-3"
+      >
+        <ButtonText className="text-xl tracking-wide">Entrar</ButtonText>
       </Button>
     </Container>
   )
