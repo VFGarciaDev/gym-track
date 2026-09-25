@@ -31,7 +31,7 @@
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --primary: 163 0 76; /* #a3004c */
+      --primary: 197 5 78; /* #c5054e */
       --primary-foreground: 253 242 248; /* #fdf2f8 */
       --card: 24 24 27; /* #18181b */
       --secondary: 39 39 42; /* #27272a */
@@ -52,7 +52,7 @@
   }
 
   :root.dark {
-    --primary: 163 0 76; /* #a3004c */
+    --primary: 252 51 135; /* #fc3387 */
     --primary-foreground: 253 242 248; /* #fdf2f8 */
     --card: 24 24 27; /* #18181b */
     --secondary: 39 39 42; /* #27272a */
