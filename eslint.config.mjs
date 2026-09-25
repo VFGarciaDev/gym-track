@@ -3,9 +3,15 @@ import prettierConflicts from "eslint-config-prettier"
 
 export default antfu(
   {
-    formatters: false,
-    ignores: ["get_network_local_ip.js", "node_modules", "dist", ".expo", "android", "ios"],
+    type: "app",
     react: true,
+    typescript: true,
+    formatters: true,
+    stylistic: {
+      semi: false,
+      quotes: "double"
+    },
+
     rules: {
       "antfu/if-newline": ["off"],
       "no-console": ["warn"],
@@ -55,10 +61,8 @@ export default antfu(
       "unused-imports/no-unused-imports": "warn",
       "unused-imports/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }]
     },
-    stylistic: false,
-    type: "app",
 
-    typescript: true
+    ignores: ["get_network_local_ip.js", "node_modules", "dist", ".expo", "android", "ios"]
   },
   {
     files: ["**/types/**/*.ts"],
