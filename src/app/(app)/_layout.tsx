@@ -2,7 +2,8 @@ import { Redirect } from "expo-router"
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui"
 
 import { useAuth } from "@/contexts/AuthContext"
-import { Text } from "@/components/ui"
+import { TabBarButton, TabBarContainer } from "@/components/TabBar"
+import { ChartNoAxesColumn, Dumbbell, UserRound } from "lucide-react-native"
 
 export default function AppLayout() {
   const { isAuthenticated } = useAuth()
@@ -12,13 +13,18 @@ export default function AppLayout() {
   return (
     <Tabs>
       <TabSlot />
-      <TabList>
-        <TabTrigger name="index" href="/(app)">
-          <Text></Text>
-        </TabTrigger>
-        <TabTrigger name="account" href="/(app)/account">
-          <Text></Text>
-        </TabTrigger>
+      <TabList asChild>
+        <TabBarContainer>
+          <TabTrigger name="index" href="/(app)" asChild>
+            <TabBarButton icon={Dumbbell} label="Treinos" />
+          </TabTrigger>
+          <TabTrigger name="progress" href="/(app)/progress" asChild>
+            <TabBarButton icon={ChartNoAxesColumn} label="Progresso" />
+          </TabTrigger>
+          <TabTrigger name="account" href="/(app)/account" asChild>
+            <TabBarButton icon={UserRound} label="Conta" />
+          </TabTrigger>
+        </TabBarContainer>
       </TabList>
     </Tabs>
   )

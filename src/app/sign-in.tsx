@@ -1,4 +1,4 @@
-import { SignInContent } from "@/screens/(auth)/sign-in"
+import { SignInContent } from "@/screens/sign-in"
 
 export default function SignInScreen() {  
   return <SignInContent />
