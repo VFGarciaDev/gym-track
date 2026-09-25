@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { LockKeyhole, UserRound } from "lucide-react-native"
 import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
+import { View } from "react-native"
 import Toast from "react-native-toast-message"
 
 import { userSignInSchema } from "@/api/auth/fetch-user-session/schema"
@@ -12,7 +13,6 @@ import { Button, ButtonText, Text } from "@/components/ui"
 import { useAuth } from "@/contexts/AuthContext"
 
 import { SignInFormControl } from "./components/SignInFormControl"
-import { View } from "react-native"
 
 export function SignInContent() {
   const { signIn } = useAuth()
@@ -32,27 +32,33 @@ export function SignInContent() {
   const onSubmit = async (credentials: UserSignInType) => {
     Toast.show({
       autoHide: false,
-      type: "loading",
+      type: "info",
       text1: "Carregando Informações...",
       text2: "Por favor, Aguarde um momento."
     })
 
-    try {
-      await signIn(credentials)
+    const response = await signIn(credentials)
 
+    Toast.hide()
+    if (response.status === "success") {
       Toast.show({
         text1: "Login realizado com sucesso!",
         topOffset: 40,
         type: "success",
         visibilityTime: 2000
       })
-    } catch (error) {
-      Toast.show({
-        type: "error",
-        text1: "Ops! Falha ao tentar se conectar",
-        text2: "Tente mais tarde ou contate o Suporte."
-      })
+
+      return
     }
+
+    Toast.show({
+      type: "error",
+      text1:
+        response.error.code === "invalid_credentials"
+          ? "Usuário ou senha inválidos"
+          : "Ops! Falha ao tentar se conectar",
+      text2: response.error.message
+    })
   }
 
   return (
