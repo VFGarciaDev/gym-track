@@ -36,9 +36,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   const signIn = useCallback(
     async (credentials: UserSignInType): Promise<SignInResponse> => {
       const currentOperationId = ++operationIdRef.current
-
+      
       try {
-        await waitForUserSessionHydration()
         const session = await fetchUserSession(credentials)
 
         if (currentOperationId !== operationIdRef.current) {
