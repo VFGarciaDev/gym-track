@@ -7,8 +7,8 @@ import { InvalidCredentialsError } from "@/lib/errors/InvalidCredentialsError"
 // import { api } from "@/lib/services/api"
 
 import { userSessionApiResponseSchema } from "./schema"
-const userName = process.env.EXPO_PUBLIC_USERNAME
-const password = process.env.EXPO_PUBLIC_PASSWORD
+const userName = process.env.EXPO_PUBLIC_APP_USERNAME
+const password = process.env.EXPO_PUBLIC_APP_PASSWORD
 
 export async function fetchUserSession(credentials: UserSignInType) {
   // const endpoint = "/auth/session"
@@ -18,13 +18,14 @@ export async function fetchUserSession(credentials: UserSignInType) {
     if (credentials.username !== userName || credentials.password !== password) {
       throw new InvalidCredentialsError()
     }
+
     const data: UserSession["user"] = {
       name: "Mayra B Silva",
       email: "",
       taxId: ""
     }
 
-    return userSessionApiResponseSchema.parse(data)
+    return userSessionApiResponseSchema.parse({ user: data })
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       throw new InvalidCredentialsError()
