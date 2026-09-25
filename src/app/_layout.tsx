@@ -22,7 +22,6 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView onLayout={hideNativeSplash} style={{ flex: 1 }}>
       <StatusBar />
-      <Toast swipeable={false} />
       <AppProviders>
         {phase === "ready" ? (
           <InitialLayout />
@@ -36,6 +35,8 @@ export default function RootLayout() {
           />
         )}
       </AppProviders>
+
+      <Toast swipeable={false} />
     </GestureHandlerRootView>
   )
 }
