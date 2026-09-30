@@ -7,6 +7,7 @@ import { InvalidCredentialsError } from "@/lib/errors/InvalidCredentialsError"
 // import { api } from "@/lib/services/api"
 
 import { userSessionApiResponseSchema } from "./schema"
+
 const userName = process.env.EXPO_PUBLIC_APP_USERNAME
 const password = process.env.EXPO_PUBLIC_APP_PASSWORD
 

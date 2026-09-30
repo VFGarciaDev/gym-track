@@ -1,12 +1,14 @@
+import type { LucideIcon } from "lucide-react-native"
 import type { PropsWithChildren } from "react"
+
 import { View } from "react-native"
+
 import { Button, ButtonIcon, ButtonText } from "../ui"
-import { LucideIcon } from "lucide-react-native"
 
 type TabBarContainerProps = PropsWithChildren
 
 export function TabBarContainer({ children }: TabBarContainerProps) {
-  return <View className="flex-row justify-evenly bg-card border-t border-border">{children}</View>
+  return <View className="flex-row justify-evenly border-t border-border bg-card">{children}</View>
 }
 
 type TabBarButtonProps = {

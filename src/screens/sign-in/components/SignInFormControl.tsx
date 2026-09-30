@@ -2,6 +2,7 @@ import type { IInputFieldProps } from "@/components/ui"
 import type { LucideIcon } from "lucide-react-native"
 
 import { AlertCircle, Eye, EyeOff } from "lucide-react-native"
+import { useState } from "react"
 
 import {
   FormControl,
@@ -15,7 +16,6 @@ import {
   InputIcon,
   InputSlot
 } from "@/components/ui"
-import { useState } from "react"
 
 type FormControlProps = IInputFieldProps & {
   label: string

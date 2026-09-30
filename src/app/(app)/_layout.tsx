@@ -1,9 +1,9 @@
 import { Redirect } from "expo-router"
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui"
-
-import { useAuth } from "@/contexts/AuthContext"
-import { TabBarButton, TabBarContainer } from "@/components/TabBar"
 import { ChartNoAxesColumn, Dumbbell, UserRound } from "lucide-react-native"
+
+import { TabBarButton, TabBarContainer } from "@/components/TabBar"
+import { useAuth } from "@/contexts/AuthContext"
 
 export default function AppLayout() {
   const { isAuthenticated } = useAuth()

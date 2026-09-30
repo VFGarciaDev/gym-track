@@ -36,7 +36,7 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   const signIn = useCallback(
     async (credentials: UserSignInType): Promise<SignInResponse> => {
       const currentOperationId = ++operationIdRef.current
-      
+
       try {
         const session = await fetchUserSession(credentials)
 

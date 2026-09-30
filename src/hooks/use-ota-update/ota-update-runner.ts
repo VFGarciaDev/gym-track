@@ -18,7 +18,7 @@ type OTAUpdateRunnerPhase = "downloading" | "restarting"
 
 export async function runOTAUpdateAttempt(
   dependencies: OTAUpdateRunnerDependencies,
-  onPhaseChange: (phase: OTAUpdateRunnerPhase) => void,
+  onPhaseChange: (phase: OTAUpdateRunnerPhase) => void
 ): Promise<"ready" | "restarting"> {
   const update = await dependencies.checkForUpdate()
   const shouldDownload = update.isAvailable || update.isRollBackToEmbedded === true
@@ -28,8 +28,7 @@ export async function runOTAUpdateAttempt(
   onPhaseChange("downloading")
 
   const downloadedUpdate = await dependencies.fetchUpdate()
-  const shouldReload =
-    downloadedUpdate.isNew || downloadedUpdate.isRollBackToEmbedded === true
+  const shouldReload = downloadedUpdate.isNew || downloadedUpdate.isRollBackToEmbedded === true
 
   if (!shouldReload) return "ready"
 

@@ -1,6 +1,9 @@
-import { Button, Icon, Text } from "@/components/ui"
-import { ChevronRight, LucideIcon } from "lucide-react-native"
+import type { LucideIcon } from "lucide-react-native"
+
+import { ChevronRight } from "lucide-react-native"
 import { View } from "react-native"
+
+import { Button, Icon, Text } from "@/components/ui"
 
 type WorkoutCardProps = {
   id: string

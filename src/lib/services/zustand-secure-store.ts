@@ -11,5 +11,5 @@ export const zustandSecureStore: StateStorage = {
   },
   removeItem: async (name: string) => {
     await SecureStore.deleteItemAsync(name)
-  },
+  }
 }

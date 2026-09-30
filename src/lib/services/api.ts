@@ -8,6 +8,6 @@ const prefix = process.env.EXPO_PUBLIC_API_URL_PREFIX ?? ""
 export const api: AxiosInstance = axios.create({
   baseURL: url + prefix,
   headers: {
-    "Content-Type": "application/json",
-  },
+    "Content-Type": "application/json"
+  }
 })

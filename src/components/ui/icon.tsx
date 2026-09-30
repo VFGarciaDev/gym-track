@@ -56,7 +56,7 @@ export { Icon }
 
 type ParameterTypes = Omit<Parameters<typeof createIcon>[0], "Root">
 
-const createIconUI = ({ ...props }: ParameterTypes) => {
+function createIconUI({ ...props }: ParameterTypes) {
   const UIIconCreateIcon = createIcon({
     Root: Svg,
     ...props

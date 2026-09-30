@@ -18,7 +18,7 @@ const FAILURE_PROGRESS = 0.45
 
 export function resolveOTAMockScenario(
   value: string | undefined,
-  isDevelopment: boolean,
+  isDevelopment: boolean
 ): OTAMockScenario | null {
   if (!isDevelopment) return null
 
@@ -34,7 +34,7 @@ export async function runMockOTAUpdateAttempt({
   onPhaseChange,
   onProgress,
   scenario,
-  wait,
+  wait
 }: RunMockOTAUpdateAttemptOptions): Promise<"ready"> {
   await wait(CHECK_DELAY_MS)
   onPhaseChange("downloading")

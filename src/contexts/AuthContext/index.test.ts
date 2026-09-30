@@ -139,9 +139,7 @@ describe("auth provider", () => {
   })
 
   it("returns a network error result", async () => {
-    dependencies.fetchUserSession.mockRejectedValue(
-      new AxiosError("Network Error", "ERR_NETWORK")
-    )
+    dependencies.fetchUserSession.mockRejectedValue(new AxiosError("Network Error", "ERR_NETWORK"))
 
     const result = await renderAuthProvider(createStoreState()).signIn(credentials)
 

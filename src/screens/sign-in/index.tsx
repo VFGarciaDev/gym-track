@@ -16,7 +16,7 @@ import { SignInFormControl } from "./components/SignInFormControl"
 
 export function SignInContent() {
   const { signIn } = useAuth()
-  const [keepConnected, setKeepConnected] = useState(false)
+  // const [keepConnected, setKeepConnected] = useState(false)
 
   const {
     control,
