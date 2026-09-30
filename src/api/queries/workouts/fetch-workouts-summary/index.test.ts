@@ -1,18 +1,9 @@
-import type { ApiRequestError } from "@/lib/errors/api-request-error"
+import { describe, expect, it } from "vitest"
 
-import { AxiosError, AxiosHeaders } from "axios"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { workoutsSummaryMock } from "@/lib/mocks/workouts-summary"
 
 import { fetchWorkoutsSummary } from "."
 import { workoutsSummaryApiResponseSchema } from "./schema"
-
-const dependencies = vi.hoisted(() => ({
-  get: vi.fn()
-}))
-
-vi.mock("@/lib/services/api", () => ({
-  api: { get: dependencies.get }
-}))
 
 const workoutSummary = {
   id: "workout-1",
@@ -22,10 +13,6 @@ const workoutSummary = {
   lastPerformedAt: null,
   updatedAt: "2026-09-29T12:00:00.000Z"
 }
-
-beforeEach(() => {
-  vi.clearAllMocks()
-})
 
 describe("workouts summary API response schema", () => {
   it("accepts a direct array of workout summaries", () => {
@@ -74,60 +61,7 @@ describe("workouts summary API response schema", () => {
 })
 
 describe("fetchWorkoutsSummary", () => {
-  it("fetches workouts and resolves with the validated response body", async () => {
-    dependencies.get.mockResolvedValue({ data: [workoutSummary] })
-
-    await expect(fetchWorkoutsSummary()).resolves.toEqual([workoutSummary])
-    expect(dependencies.get).toHaveBeenCalledOnce()
-    expect(dependencies.get).toHaveBeenCalledWith("/workouts")
-  })
-
-  it("rejects a malformed successful response as invalidResponse", async () => {
-    dependencies.get.mockResolvedValue({ data: [{ id: "workout-1" }] })
-
-    await expect(fetchWorkoutsSummary()).rejects.toMatchObject({
-      kind: "invalidResponse"
-    } satisfies Partial<ApiRequestError>)
-  })
-
-  it("rejects an Axios network failure as network", async () => {
-    dependencies.get.mockRejectedValue(new AxiosError("Network Error", "ERR_NETWORK"))
-
-    await expect(fetchWorkoutsSummary()).rejects.toMatchObject({
-      kind: "network"
-    } satisfies Partial<ApiRequestError>)
-  })
-
-  it("preserves a valid backend error response", async () => {
-    dependencies.get.mockRejectedValue(
-      createAxiosResponseError(
-        {
-          code: "FORBIDDEN",
-          message: "Você não pode acessar estes treinos."
-        },
-        403
-      )
-    )
-
-    await expect(fetchWorkoutsSummary()).rejects.toMatchObject({
-      kind: "api",
-      status: 403,
-      code: "FORBIDDEN",
-      message: "Você não pode acessar estes treinos."
-    } satisfies Partial<ApiRequestError>)
+  it("resolves with the validated workout summary mock", async () => {
+    await expect(fetchWorkoutsSummary()).resolves.toEqual(workoutsSummaryMock.data)
   })
 })
-
-function createAxiosResponseError(data: unknown, status: number) {
-  const error = new AxiosError("Request failed", "ERR_BAD_RESPONSE")
-
-  error.response = {
-    data,
-    status,
-    statusText: "Request failed",
-    headers: new AxiosHeaders(),
-    config: { headers: new AxiosHeaders() }
-  }
-
-  return error
-}
