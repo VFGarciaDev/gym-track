@@ -1,8 +1,10 @@
 # Contratos planejados
 
-Este documento registra tipagens aprovadas no planejamento que ainda não foram implementadas. Elas devem orientar mocks, schemas Zod, funções Axios, backend e persistência local.
+Este documento registra contratos aprovados no planejamento que ainda não foram implementados. Tipagens compartilhadas já implementadas aparecem como dependências para manter os exemplos compreensíveis.
 
 ## Estados compartilhados
+
+**Status:** implementado em `src/types`; utilizado pelos contratos planejados abaixo.
 
 ```ts
 type ExerciseSource = "catalog" | "private"
@@ -13,7 +15,7 @@ type RepetitionTarget =
   { type: "fixed"; value: number } | { type: "range"; minimum: number; maximum: number }
 ```
 
-`ExerciseSource` usa `private` para coincidir com a tipagem já criada no projeto. Esses tipos devem nascer de schemas Zod quando forem migrados ou implementados.
+`ExerciseSource` usa `private` para representar exercícios privados do autor. `ExerciseSource`, `WorkoutSection` e `RepetitionTarget` já são derivados de schemas Zod. `WorkoutSessionStatus` continua planejado.
 
 ## Gravação de ficha
 
@@ -89,30 +91,6 @@ type CreatePrivateExerciseInput = {
 ### Por que existe
 
 `source` informa a origem; `canEdit` informa a permissão efetiva. O front não precisa recriar regras de autorização. A paginação por cursor prepara o catálogo para crescer sem trocar o formato.
-
-## Erro comum da API
-
-**Status:** aprovado, não implementado.
-
-```ts
-type ApiError = {
-  error: {
-    code: "VALIDATION_ERROR" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "CONFLICT"
-    message: string
-    fields?: Record<string, string[]>
-  }
-}
-```
-
-### Onde será usado
-
-- schemas das respostas de erro;
-- conversão dos erros Axios em falhas compreensíveis para a aplicação;
-- mensagens gerais e mensagens associadas a campos de formulários.
-
-### Por que existe
-
-Todas as funcionalidades precisam tratar erros com a mesma estrutura. `fields` só existe quando o erro pode ser associado a entradas específicas.
 
 ## Plano de execução
 

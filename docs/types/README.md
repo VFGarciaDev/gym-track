@@ -37,26 +37,27 @@ Não entram propriedades locais de componentes visuais, estados temporários de 
 - Valores de enumeração usam nomes legíveis e estáveis, como `warmup`, `main` e `inProgress`.
 - Posições de exercícios começam em zero dentro de cada seção; números de série começam em um para corresponder ao que o usuário vê.
 - Cargas são expressas em quilogramas e podem ser `null` para primeira execução ou exercício sem carga externa.
-- Respostas recebidas pelo Axios são consideradas desconhecidas até serem validadas por um schema Zod.
+- Respostas recebidas pelo Axios só entram na aplicação depois de serem validadas por um schema Zod.
+- Arquivos que não são componentes usam `kebab-case`.
 
 ## Organização recomendada no código
 
-Quando os contratos forem implementados, cada recurso deve manter próximos o schema, o tipo inferido e a função que valida a resposta. Uma organização possível é:
+Cada recurso mantém próximos o schema específico, o tipo inferido e a função que valida a resposta. Queries e actions ficam separadas:
 
 ```text
-src/api/workouts/
-├── list-workouts/
-│   ├── index.ts
-│   └── schema.ts
-├── fetch-workout/
-│   ├── index.ts
-│   └── schema.ts
-└── save-workout/
-    ├── index.ts
-    └── schema.ts
+src/api/
+├── queries/
+│   └── workouts/
+│       ├── fetch-workouts-summary/
+│       └── get-workout/
+└── actions/
+    └── workouts/
+        ├── create-workout/
+        ├── update-workout/
+        └── delete-workout/
 ```
 
-O padrão já aparece no fluxo de autenticação: a função faz a chamada, o schema valida a resposta e o tipo é inferido do schema.
+Listagens usam `fetch-`; consultas por identificador usam `get-`. Schemas e tipos utilizados por mais de um módulo ficam em `src/types`; contratos exclusivos permanecem na pasta da operação. A referência completa está em [`docs/api/README.md`](../api/README.md).
 
 ## Como manter este catálogo
 

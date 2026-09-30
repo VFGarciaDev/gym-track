@@ -1,67 +1,50 @@
 # Tipagens implementadas
 
-Status conferido em 28 de setembro de 2026. Este documento descreve somente tipagens encontradas no repositório; arquivos ainda não rastreados pelo Git continuam sendo trabalho local do projeto e são identificados abaixo.
+Status conferido em 30 de setembro de 2026. Este documento descreve tipagens e schemas existentes no repositório após a criação da estrutura de referência da API.
 
 ## Inventário
 
-| Tipo ou schema                 | Local atual                                 | Uso                                                     | Motivo                                                                       |
-| ------------------------------ | ------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `userSchema`                   | `src/types/user-session.ts`                 | Validar os dados do usuário autenticado.                | Impedir que uma sessão com formato inesperado entre no estado global.        |
-| `User`                         | `src/types/user-session.ts`                 | Representar o usuário após validação.                   | Compartilhar a mesma forma entre API, contexto e store.                      |
-| `UserSession`                  | `src/types/user-session.ts`                 | Estado persistido da sessão autenticada.                | Agrupar os dados necessários depois do login.                                |
-| `userSignInSchema`             | `src/api/auth/fetch-user-session/schema.ts` | Validar credenciais preenchidas no login.               | Produzir mensagens por campo e impedir envio vazio.                          |
-| `UserSignInType`               | `src/api/auth/fetch-user-session/schema.ts` | Entrada da função de login e do formulário.             | Derivar o tipo diretamente do schema Zod.                                    |
-| `userSessionApiResponseSchema` | `src/api/auth/fetch-user-session/schema.ts` | Validar a resposta do login.                            | Não confiar apenas na anotação genérica do Axios.                            |
-| `SignInResponse`               | `src/contexts/AuthContext/index.tsx`        | Resultado tratado da tentativa de login.                | Permitir que a tela diferencie sucesso, credenciais, rede e erro inesperado. |
-| `RepetitionTarget`             | `src/types/index.ts`                        | Meta fixa ou intervalo de repetições.                   | Evitar combinações inválidas de campos opcionais.                            |
-| `ExerciseSource`               | `src/types/index.ts`                        | Diferenciar catálogo compartilhado e exercício privado. | Orientar exibição e permissões.                                              |
-| `WorkoutSection`               | `src/types/index.ts`                        | Identificar aquecimento ou treino principal.            | Ordenar e apresentar os exercícios na seção correta.                         |
-| `WorkoutSummary`               | `src/types/workout.ts`                      | Card da listagem de fichas.                             | Evitar carregar o detalhe completo na tela inicial.                          |
-| `WorkoutListResponse`          | `src/types/workout.ts`                      | Resposta paginada da listagem.                          | Preparar o contrato para crescimento por cursor.                             |
-| `WorkoutExercise`              | `src/types/workout.ts`                      | Exercício configurado dentro de uma ficha.              | Separar o exercício reutilizável da prescrição específica da ficha.          |
-| `WorkoutDetail`                | `src/types/workout.ts`                      | Detalhe completo da ficha.                              | Alimentar visualização, edição e preparação da execução.                     |
+| Tipo ou schema                     | Local atual                                                 | Uso                                            | Motivo                                                                       |
+| ---------------------------------- | ----------------------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| `userSchema`                       | `src/types/user-session.ts`                                 | Validar os dados do usuário autenticado.       | Impedir que uma sessão inesperada entre no estado global.                    |
+| `User`                             | `src/types/user-session.ts`                                 | Representar o usuário após validação.          | Compartilhar a mesma estrutura entre API, contexto e store.                  |
+| `UserSession`                      | `src/types/user-session.ts`                                 | Estado persistido da sessão autenticada.       | Agrupar os dados necessários depois do login.                                |
+| `userSignInSchema`                 | `src/api/auth/fetch-user-session/schema.ts`                 | Validar as credenciais preenchidas.            | Produzir mensagens por campo e impedir envio vazio.                          |
+| `UserSignInType`                   | `src/api/auth/fetch-user-session/schema.ts`                 | Entrada da função de login e do formulário.    | Derivar o tipo diretamente do schema Zod.                                    |
+| `userSessionApiResponseSchema`     | `src/api/auth/fetch-user-session/schema.ts`                 | Validar a resposta do login.                   | Não confiar apenas na tipagem estática da chamada.                           |
+| `exerciseSourceSchema`             | `src/types/exercise.ts`                                     | Validar a origem de um exercício.              | Compartilhar os valores `catalog` e `private` entre contratos.               |
+| `ExerciseSource`                   | `src/types/exercise.ts`                                     | Representar a origem após validação.           | Orientar exibição e permissões sem duplicar a união.                         |
+| `workoutSectionSchema`             | `src/types/workout.ts`                                      | Validar a seção da ocorrência de um exercício. | Limitar o contrato a `warmup` e `main`.                                      |
+| `WorkoutSection`                   | `src/types/workout.ts`                                      | Representar uma seção após validação.          | Compartilhar a estrutura entre futuros contratos.                            |
+| `repetitionTargetSchema`           | `src/types/workout.ts`                                      | Validar meta fixa ou intervalo de repetições.  | Impedir valores não positivos, decimais e intervalos invertidos.             |
+| `RepetitionTarget`                 | `src/types/workout.ts`                                      | Representar a meta após validação.             | Evitar combinações inválidas e duplicação do schema.                         |
+| `apiErrorResponseSchema`           | `src/types/api.ts`                                          | Validar um erro devolvido pelo backend.        | Manter `code`, `message` e erros por campo em um contrato comum.             |
+| `ApiErrorResponse`                 | `src/types/api.ts`                                          | Representar o corpo validado do erro.          | Derivar a tipagem usada pelo normalizador.                                   |
+| `ApiRequestError`                  | `src/lib/errors/api-request-error.ts`                       | Erro interno consumido pela aplicação.         | Separar rede, HTTP, contrato inválido, cancelamento e erro do backend.       |
+| `workoutSummarySchema`             | `src/api/queries/workouts/fetch-workouts-summary/schema.ts` | Validar cada item da listagem de treinos.      | Manter o contrato específico ao lado da única operação que o utiliza.        |
+| `workoutsSummaryApiResponseSchema` | `src/api/queries/workouts/fetch-workouts-summary/schema.ts` | Validar o array retornado por `GET /workouts`. | Garantir o formato antes que os dados entrem no aplicativo.                  |
+| `WorkoutsSummaryApiResponse`       | `src/api/queries/workouts/fetch-workouts-summary/schema.ts` | Tipo retornado por `fetchWorkoutsSummary`.     | Oferecer inferência a consumidores futuros, incluindo TanStack Query.        |
+| `SignInResponse`                   | `src/contexts/AuthContext/index.tsx`                        | Resultado tratado da tentativa de login.       | Permitir que a tela diferencie sucesso, credenciais, rede e erro inesperado. |
 
-## Autenticação
+## Schemas compartilhados
 
-### `User`
-
-```ts
-type User = {
-  name: string
-  email: string
-  taxId: string
-}
-```
-
-O tipo é inferido de `userSchema`. Atualmente todos os campos são obrigatórios. A definição do identificador público usado no login e a necessidade futura de `taxId` ainda devem ser revisitadas quando a autenticação real for planejada.
-
-### `UserSession`
+### `ExerciseSource`
 
 ```ts
-type UserSession = {
-  user: User
-}
+const exerciseSourceSchema = z.enum(["catalog", "private"])
+type ExerciseSource = z.infer<typeof exerciseSourceSchema>
 ```
 
-É consumido pelo contexto de autenticação e pela store persistida. Tokens e expiração ainda não fazem parte dessa tipagem porque o login atual é simulado.
+`private` identifica um exercício pertencente ao autor, independentemente de ele atuar como personal trainer.
 
-### `SignInResponse`
+### `WorkoutSection`
 
 ```ts
-type SignInResponse =
-  | { status: "success" }
-  | {
-      status: "error"
-      error: {
-        code: "invalid_credentials" | "network" | "unexpected"
-        message: string
-      }
-    }
+const workoutSectionSchema = z.enum(["warmup", "main"])
+type WorkoutSection = z.infer<typeof workoutSectionSchema>
 ```
 
-Esse tipo pertence à camada de aplicação. Ele não representa diretamente a resposta HTTP: o contexto converte erros técnicos em estados que a interface consegue apresentar.
-
-## Fichas e exercícios
+A seção pertence à ocorrência do exercício na ficha. A posição será independente dentro de cada seção.
 
 ### `RepetitionTarget`
 
@@ -70,84 +53,52 @@ type RepetitionTarget =
   { type: "fixed"; value: number } | { type: "range"; minimum: number; maximum: number }
 ```
 
-O discriminador `type` permite validar e renderizar cada forma sem depender de campos opcionais. A implementação futura em Zod deve usar uma união discriminada e validar valores positivos e `minimum <= maximum`.
+O tipo é inferido de uma união discriminada. O schema exige números inteiros positivos e associa ao campo `maximum` o erro de um intervalo em que o máximo seja menor que o mínimo.
 
-### `ExerciseSource`
+## Erros da API
+
+### `ApiErrorResponse`
 
 ```ts
-type ExerciseSource = "catalog" | "private"
+type ApiErrorResponse = {
+  code: string
+  message: string
+  fields?: Record<string, string[]>
+}
 ```
 
-O valor implementado é `private`. Ele substitui o termo preliminar `personal` usado no planejamento e expressa melhor a regra: o exercício é privado do autor, independentemente de ele ser personal trainer.
+Esse é o único envelope comum da API. Respostas bem-sucedidas retornam diretamente os dados da operação.
 
-### `WorkoutSection`
+### `ApiRequestError`
+
+`normalizeApiError` converte falhas técnicas em uma classe interna com as categorias:
 
 ```ts
-type WorkoutSection = "warmup" | "main"
+type ApiRequestErrorKind =
+  "api" | "network" | "invalidResponse" | "cancelled" | "http" | "unexpected"
 ```
 
-O tipo é usado na ocorrência do exercício na ficha. A posição é independente em cada seção.
+Quando o backend responde com o contrato esperado, o erro preserva `status`, `code`, `message` e `fields`. Falhas de schema, rede, cancelamento e respostas HTTP fora do contrato recebem categorias próprias.
 
-### `WorkoutSummary` e `WorkoutListResponse`
+## Listagem de treinos
 
 ```ts
-type WorkoutSummary = {
+type WorkoutsSummaryApiResponse = Array<{
   id: string
   name: string
   restSeconds: number
-  warmupExerciseCount: number
-  mainExerciseCount: number
+  exercisesCount: number
   lastPerformedAt: string | null
   updatedAt: string
-}
-
-type WorkoutListResponse = {
-  items: WorkoutSummary[]
-  nextCursor: string | null
-}
+}>
 ```
 
-São destinados à tela “Meus treinos”. `nextCursor` igual a `null` indica que não há outra página.
+O retorno é um array direto, sem paginação. `exercisesCount` contém somente a quantidade de exercícios principais. A contagem de aquecimentos não faz parte dessa resposta.
 
-### `WorkoutExercise` e `WorkoutDetail`
+`WorkoutSummary` não fica em `src/types`, pois atualmente pertence apenas a `fetch-workouts-summary`. Ele será movido para uma tipagem compartilhada somente quando outro módulo realmente reutilizar o mesmo contrato.
 
-```ts
-type WorkoutExercise = {
-  id: string
-  exercise: {
-    id: string
-    name: string
-    source: ExerciseSource
-  }
-  section: WorkoutSection
-  position: number
-  notes: string | null
-  sets: number
-  repetitionTarget: RepetitionTarget
-}
+## Autenticação existente
 
-type WorkoutDetail = {
-  id: string
-  name: string
-  restSeconds: number
-  exercises: WorkoutExercise[]
-  createdAt: string
-  updatedAt: string
-}
-```
+Os contratos de autenticação anteriores permanecem implementados. `User`, `UserSession` e `UserSignInType` já são derivados de schemas. A autenticação ainda é simulada e será revisitada junto ao backend real.
 
-`WorkoutExercise.id` identifica a ocorrência na ficha; `exercise.id` identifica o item reutilizável do catálogo. Essa separação é necessária para sugestões de carga, exercícios repetidos e preservação do histórico.
-
-## Estado de migração para Zod
-
-Os tipos de autenticação já usam schemas Zod. As tipagens de ficha em `src/types/index.ts` e `src/types/workout.ts` foram escritas manualmente e ainda não possuem schemas correspondentes. O estado desejado é:
-
-```ts
-export const workoutSummarySchema = z.object({
-  // definição validável em tempo de execução
-})
-
-export type WorkoutSummary = z.infer<typeof workoutSummarySchema>
-```
-
-Essa migração ainda não foi realizada e não deve ser marcada como concluída no planejamento.
+`SignInResponse` pertence à camada de aplicação e não representa diretamente uma resposta HTTP. O contexto converte falhas técnicas em estados que a interface consegue apresentar.
