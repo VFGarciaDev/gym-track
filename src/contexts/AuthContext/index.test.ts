@@ -103,15 +103,12 @@ describe("auth provider", () => {
     expect(context.isAuthenticated).toBe(false)
   })
 
-  it("waits for hydration and persists a successful sign in", async () => {
+  it("fetches and persists a successful sign in without waiting for hydration", async () => {
     const events: string[] = []
     const state = createStoreState({
       setSession: () => {
         events.push("persisted")
       }
-    })
-    dependencies.waitForUserSessionHydration.mockImplementation(async () => {
-      events.push("hydrated")
     })
     dependencies.fetchUserSession.mockImplementation(async () => {
       events.push("fetched")
@@ -120,7 +117,8 @@ describe("auth provider", () => {
 
     const result = await renderAuthProvider(state).signIn(credentials)
 
-    expect(events).toEqual(["hydrated", "fetched", "persisted"])
+    expect(events).toEqual(["fetched", "persisted"])
+    expect(dependencies.waitForUserSessionHydration).not.toHaveBeenCalled()
     expect(result).toEqual({ status: "success" })
   })
 
