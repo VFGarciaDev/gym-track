@@ -12,9 +12,13 @@ export const repetitionTargetSchema = z
       type: z.literal("range"),
       minimum: z.number().int().positive(),
       maximum: z.number().int().positive()
+    }),
+    z.object({
+      type: z.literal("duration"),
+      seconds: z.number().int().positive()
     })
   ])
-  .refine((target) => target.type === "fixed" || target.maximum >= target.minimum, {
+  .refine((target) => target.type !== "range" || target.maximum >= target.minimum, {
     error: "O máximo deve ser maior ou igual ao mínimo.",
     path: ["maximum"]
   })

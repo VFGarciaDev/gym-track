@@ -29,13 +29,23 @@ describe("shared schemas", () => {
     })
   })
 
+  it("accepts a positive integer duration in seconds", () => {
+    expect(repetitionTargetSchema.parse({ type: "duration", seconds: 60 })).toEqual({
+      type: "duration",
+      seconds: 60
+    })
+  })
+
   it.each([
     { type: "fixed", value: 0 },
     { type: "fixed", value: -1 },
     { type: "fixed", value: 10.5 },
     { type: "range", minimum: 0, maximum: 12 },
     { type: "range", minimum: 8, maximum: -1 },
-    { type: "range", minimum: 8.5, maximum: 12 }
+    { type: "range", minimum: 8.5, maximum: 12 },
+    { type: "duration", seconds: 0 },
+    { type: "duration", seconds: -1 },
+    { type: "duration", seconds: 60.5 }
   ])("rejects invalid repetition values: $type", (target) => {
     expect(repetitionTargetSchema.safeParse(target).success).toBe(false)
   })
