@@ -1,39 +1,23 @@
-import type { ExerciseSource, RepetitionTarget, WorkoutSection } from "."
+import * as z from "zod"
 
-export type WorkoutSummary = {
-  id: string
-  name: string
-  restSeconds: number
-  warmupExerciseCount: number
-  mainExerciseCount: number
-  lastPerformedAt: string | null
-  updatedAt: string
-}
+export const workoutSectionSchema = z.enum(["warmup", "main"])
 
-export type WorkoutListResponse = {
-  items: WorkoutSummary[]
-  nextCursor: string | null
-}
+export const repetitionTargetSchema = z
+  .discriminatedUnion("type", [
+    z.object({
+      type: z.literal("fixed"),
+      value: z.number().int().positive()
+    }),
+    z.object({
+      type: z.literal("range"),
+      minimum: z.number().int().positive(),
+      maximum: z.number().int().positive()
+    })
+  ])
+  .refine((target) => target.type === "fixed" || target.maximum >= target.minimum, {
+    error: "O máximo deve ser maior ou igual ao mínimo.",
+    path: ["maximum"]
+  })
 
-export type WorkoutExercise = {
-  id: string
-  exercise: {
-    id: string
-    name: string
-    source: ExerciseSource
-  }
-  section: WorkoutSection
-  position: number
-  notes: string | null
-  sets: number
-  repetitionTarget: RepetitionTarget
-}
-
-export type WorkoutDetail = {
-  id: string
-  name: string
-  restSeconds: number
-  exercises: WorkoutExercise[]
-  createdAt: string
-  updatedAt: string
-}
+export type WorkoutSection = z.infer<typeof workoutSectionSchema>
+export type RepetitionTarget = z.infer<typeof repetitionTargetSchema>
