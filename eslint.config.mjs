@@ -62,7 +62,7 @@ export default antfu(
       "unused-imports/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }]
     },
 
-    ignores: ["get_network_local_ip.js", "node_modules", "dist", ".expo", "android", "ios"]
+    ignores: ["get_network_local_ip.js", "node_modules", "dist", ".expo", "android", "ios", "docs"]
   },
   {
     files: ["**/types/**/*.ts"],
