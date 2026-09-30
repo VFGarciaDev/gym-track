@@ -99,6 +99,7 @@ type IBadgeIconProps = React.ComponentPropsWithoutRef<typeof PrimitiveIcon> &
 const StyledUIIcon = styled(UIIcon, {
   className: {
     target: "style",
+    // @ts-expect-error
     nativeStyleToProp: {
       height: true,
       width: true,

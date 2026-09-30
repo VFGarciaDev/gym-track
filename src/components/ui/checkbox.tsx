@@ -29,6 +29,7 @@ const IconWrapper = React.forwardRef<
   React.ComponentRef<typeof UIIcon>,
   React.ComponentPropsWithoutRef<typeof UIIcon>
 >(({ ...props }, ref) => {
+  // @ts-expect-error
   return <StyledUIIcon {...props} ref={ref} />
 })
 
@@ -110,6 +111,7 @@ type ICheckboxIconProps = React.ComponentPropsWithoutRef<typeof UICheckbox.Icon>
 const CheckboxIcon = React.forwardRef<
   React.ComponentRef<typeof UICheckbox.Icon>,
   ICheckboxIconProps
+  // @ts-expect-error
 >(({ className, size, ...props }, ref) => {
   if (typeof size === "number") {
     return (
@@ -120,6 +122,7 @@ const CheckboxIcon = React.forwardRef<
         size={size}
       />
     )
+    // @ts-expect-error
   } else if ((props.height !== undefined || props.width !== undefined) && size === undefined) {
     return (
       <UICheckbox.Icon ref={ref} {...props} className={checkboxIconStyle({ class: className })} />
