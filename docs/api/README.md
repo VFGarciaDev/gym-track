@@ -12,7 +12,7 @@ src/api/
 │       │   ├── index.ts
 │       │   ├── index.test.ts
 │       │   └── schema.ts
-│       └── get-workout/
+│       └── get-workout-details/
 └── actions/
     └── workouts/
         ├── create-workout/
@@ -23,7 +23,7 @@ src/api/
 - `queries`: operações `GET` que consultam dados.
 - `actions`: operações `POST`, `PUT` e `DELETE` que alteram dados.
 - `fetch-`: lista uma coleção, como `fetch-workouts-summary`.
-- `get-`: consulta um registro por identificador, como `get-workout`.
+- `get-`: consulta um registro por identificador, como `get-workout-details`.
 - Arquivos que não são componentes usam `kebab-case`.
 
 ## Localização dos contratos
@@ -81,6 +81,12 @@ Erros do backend seguem o contrato compartilhado de `src/types/api.ts`:
 ```
 
 `fields` é opcional. A função `normalizeApiError` converte erros do backend, rede, validação, cancelamento e respostas HTTP inválidas em `ApiRequestError`.
+
+## Detalhe da ficha
+
+`getWorkoutDetails(workoutId)` representa `GET /workouts/:workoutId`. Seu retorno contém a ficha completa, com exercícios de aquecimento e principais no mesmo array. Cada série possui sua própria posição, meta de repetições e carga. Uma meta pode ser fixa, um intervalo ou uma duração em segundos.
+
+Enquanto o backend não existe, a função retorna um mock local. O mock passa por `workoutApiResponseSchema.parse`, preservando a validação e a assinatura que serão usadas quando a chamada Axios substituir o mock.
 
 ## Fluxo de uma query
 

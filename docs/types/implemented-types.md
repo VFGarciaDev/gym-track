@@ -16,7 +16,7 @@ Status conferido em 30 de setembro de 2026. Este documento descreve tipagens e s
 | `ExerciseSource`                   | `src/types/exercise.ts`                                     | Representar a origem após validação.           | Orientar exibição e permissões sem duplicar a união.                         |
 | `workoutSectionSchema`             | `src/types/workout.ts`                                      | Validar a seção da ocorrência de um exercício. | Limitar o contrato a `warmup` e `main`.                                      |
 | `WorkoutSection`                   | `src/types/workout.ts`                                      | Representar uma seção após validação.          | Compartilhar a estrutura entre futuros contratos.                            |
-| `repetitionTargetSchema`           | `src/types/workout.ts`                                      | Validar meta fixa ou intervalo de repetições.  | Impedir valores não positivos, decimais e intervalos invertidos.             |
+| `repetitionTargetSchema`           | `src/types/workout.ts`                                      | Validar meta por repetição ou duração.         | Impedir valores não positivos, decimais e intervalos invertidos.             |
 | `RepetitionTarget`                 | `src/types/workout.ts`                                      | Representar a meta após validação.             | Evitar combinações inválidas e duplicação do schema.                         |
 | `apiErrorResponseSchema`           | `src/types/api.ts`                                          | Validar um erro devolvido pelo backend.        | Manter `code`, `message` e erros por campo em um contrato comum.             |
 | `ApiErrorResponse`                 | `src/types/api.ts`                                          | Representar o corpo validado do erro.          | Derivar a tipagem usada pelo normalizador.                                   |
@@ -24,6 +24,8 @@ Status conferido em 30 de setembro de 2026. Este documento descreve tipagens e s
 | `workoutSummarySchema`             | `src/api/queries/workouts/fetch-workouts-summary/schema.ts` | Validar cada item da listagem de treinos.      | Manter o contrato específico ao lado da única operação que o utiliza.        |
 | `workoutsSummaryApiResponseSchema` | `src/api/queries/workouts/fetch-workouts-summary/schema.ts` | Validar o array retornado por `GET /workouts`. | Garantir o formato antes que os dados entrem no aplicativo.                  |
 | `WorkoutsSummaryApiResponse`       | `src/api/queries/workouts/fetch-workouts-summary/schema.ts` | Tipo retornado por `fetchWorkoutsSummary`.     | Oferecer inferência a consumidores futuros, incluindo TanStack Query.        |
+| `workoutApiResponseSchema`         | `src/api/queries/workouts/get-workout-details/schema.ts`    | Validar o detalhe completo de uma ficha.       | Garantir exercícios e configurações específicas de cada série.               |
+| `WorkoutApiResponse`               | `src/api/queries/workouts/get-workout-details/schema.ts`    | Tipo retornado por `getWorkoutDetails`.        | Alimentar detalhes e futura edição da ficha com dados já validados.          |
 | `SignInResponse`                   | `src/contexts/AuthContext/index.tsx`                        | Resultado tratado da tentativa de login.       | Permitir que a tela diferencie sucesso, credenciais, rede e erro inesperado. |
 
 ## Schemas compartilhados
@@ -50,10 +52,12 @@ A seção pertence à ocorrência do exercício na ficha. A posição será inde
 
 ```ts
 type RepetitionTarget =
-  { type: "fixed"; value: number } | { type: "range"; minimum: number; maximum: number }
+  | { type: "fixed"; value: number }
+  | { type: "range"; minimum: number; maximum: number }
+  | { type: "duration"; seconds: number }
 ```
 
-O tipo é inferido de uma união discriminada. O schema exige números inteiros positivos e associa ao campo `maximum` o erro de um intervalo em que o máximo seja menor que o mínimo.
+O tipo é inferido de uma união discriminada. O schema exige números inteiros positivos para repetições e duração em segundos e associa ao campo `maximum` o erro de um intervalo em que o máximo seja menor que o mínimo.
 
 ## Erros da API
 
@@ -96,6 +100,40 @@ type WorkoutsSummaryApiResponse = Array<{
 O retorno é um array direto, sem paginação. `exercisesCount` contém somente a quantidade de exercícios principais. A contagem de aquecimentos não faz parte dessa resposta.
 
 `WorkoutSummary` não fica em `src/types`, pois atualmente pertence apenas a `fetch-workouts-summary`. Ele será movido para uma tipagem compartilhada somente quando outro módulo realmente reutilizar o mesmo contrato.
+
+## Detalhe da ficha
+
+```ts
+type WorkoutApiResponse = {
+  id: string
+  name: string
+  restSeconds: number
+  exercises: Array<{
+    id: string
+    exercise: {
+      id: string
+      name: string
+      source: ExerciseSource
+    }
+    section: WorkoutSection
+    position: number
+    notes: string | null
+    sets: Array<{
+      id: string
+      position: number
+      repetitionTarget: RepetitionTarget
+      loadKg: number | null
+    }>
+  }>
+  lastPerformedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+```
+
+O retorno é direto, sem envelope. Cada série possui sua própria meta de repetições e carga; a quantidade de séries é derivada do tamanho do array. O contrato não registra repetições realmente realizadas.
+
+Enquanto o backend não existe, `getWorkoutDetails` procura o identificador em `src/lib/mocks/workout.ts` e valida o resultado com o mesmo schema da futura resposta HTTP.
 
 ## Autenticação existente
 

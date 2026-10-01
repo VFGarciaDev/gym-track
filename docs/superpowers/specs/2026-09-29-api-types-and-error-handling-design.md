@@ -78,13 +78,14 @@ O schema existe porque a origem do exercício participa de contratos externos qu
 `src/types/workout.ts` define:
 
 - `workoutSectionSchema` e `WorkoutSection`, com os valores `warmup` e `main`;
-- `repetitionTargetSchema` e `RepetitionTarget`, como união discriminada entre valor fixo e intervalo.
+- `repetitionTargetSchema` e `RepetitionTarget`, inicialmente como união discriminada entre valor fixo e intervalo. A variante de duração foi adicionada posteriormente para exercícios baseados em tempo.
 
 O schema de repetições garante:
 
 - valor fixo inteiro e positivo;
 - mínimo e máximo inteiros e positivos;
 - máximo maior ou igual ao mínimo.
+- duração em segundos inteira e positiva.
 
 Estados exclusivamente locais, como `RestTimerState`, continuam somente como tipos até surgir uma necessidade concreta de validar dados externos ou persistidos.
 

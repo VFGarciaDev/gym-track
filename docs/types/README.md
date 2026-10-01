@@ -49,7 +49,7 @@ src/api/
 ├── queries/
 │   └── workouts/
 │       ├── fetch-workouts-summary/
-│       └── get-workout/
+│       └── get-workout-details/
 └── actions/
     └── workouts/
         ├── create-workout/

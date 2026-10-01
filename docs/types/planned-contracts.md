@@ -12,7 +12,9 @@ type WorkoutSection = "warmup" | "main"
 type WorkoutSessionStatus = "inProgress" | "completed" | "incomplete"
 
 type RepetitionTarget =
-  { type: "fixed"; value: number } | { type: "range"; minimum: number; maximum: number }
+  | { type: "fixed"; value: number }
+  | { type: "range"; minimum: number; maximum: number }
+  | { type: "duration"; seconds: number }
 ```
 
 `ExerciseSource` usa `private` para representar exercícios privados do autor. `ExerciseSource`, `WorkoutSection` e `RepetitionTarget` já são derivados de schemas Zod. `WorkoutSessionStatus` continua planejado.
@@ -28,8 +30,12 @@ type WorkoutExerciseInput = {
   section: WorkoutSection
   position: number
   notes: string | null
-  sets: number
-  repetitionTarget: RepetitionTarget
+  sets: Array<{
+    id: string | null
+    position: number
+    repetitionTarget: RepetitionTarget
+    loadKg: number | null
+  }>
 }
 
 type SaveWorkoutInput = {
@@ -48,16 +54,27 @@ type SaveWorkoutInput = {
 
 ### Por que existe
 
-O mesmo formato atende criação e edição. `id: null` representa uma nova ocorrência; um identificador existente preserva a ligação usada pelas sugestões de carga. O usuário autenticado vem da sessão e não é enviado como proprietário.
+O mesmo formato atende criação e edição. `id: null` representa uma nova ocorrência ou série; um identificador existente preserva a ligação usada pelas sugestões de carga. O usuário autenticado vem da sessão e não é enviado como proprietário.
 
 ### Regras
 
 - Nome não pode ficar vazio.
 - Descanso deve ser um número inteiro positivo em segundos.
 - Deve existir pelo menos um exercício na seção principal.
-- `sets` deve ser inteiro positivo.
+- Cada exercício deve ter ao menos uma série.
+- Cada série possui sua própria meta de repetições e carga.
+- `loadKg` aceita número não negativo ou `null`.
 - Posições começam em zero e não se repetem dentro da mesma seção.
+- Posições das séries começam em zero e não se repetem dentro do mesmo exercício.
 - Observação vazia é normalizada para `null`.
+
+## Detalhe da ficha
+
+**Status:** implementado em `src/api/queries/workouts/get-workout-details`.
+
+`GET /workouts/:workoutId` retorna diretamente a ficha completa. Aquecimento e exercícios principais compartilham o mesmo array e são diferenciados por `section`. Cada exercício contém suas séries, e cada série possui posição, meta de repetições e carga próprias.
+
+A quantidade de séries é derivada de `sets.length`. Metas de duração usam segundos. Não existe campo de repetições realmente realizadas.
 
 ## Catálogo de exercícios
 
@@ -109,9 +126,10 @@ type WorkoutExecutionPlan = {
     section: WorkoutSection
     position: number
     notes: string | null
-    repetitionTarget: RepetitionTarget
     sets: Array<{
-      setNumber: number
+      workoutSetId: string
+      position: number
+      repetitionTarget: RepetitionTarget
       suggestedLoadKg: number | null
     }>
   }>
@@ -136,7 +154,9 @@ Reúne a prescrição e as sugestões necessárias para começar sem depender de
 ```ts
 type WorkoutSessionSet = {
   id: string
-  setNumber: number
+  workoutSetId: string
+  position: number
+  repetitionTarget: RepetitionTarget
   loadKg: number | null
   completedAt: string | null
 }
@@ -149,7 +169,6 @@ type WorkoutSessionExercise = {
   section: WorkoutSection
   position: number
   notes: string | null
-  repetitionTarget: RepetitionTarget
   sets: WorkoutSessionSet[]
 }
 
@@ -186,6 +205,7 @@ O celular cria os identificadores antes da sincronização. O snapshot preserva 
 - Sessão `completed` representa todas as séries planejadas concluídas.
 - Encerramento antecipado usa `incomplete` e preserva as cargas das séries concluídas.
 - Sessão incompleta não alimenta sugestões futuras.
+- Cada série preserva sua própria meta de repetições e carga no snapshot da sessão.
 - `loadKg` aceita número não negativo ou `null`; `null` também atende exercícios sem carga externa.
 - Sessões encerradas possuem `endedAt`; sessão em andamento possui `endedAt: null`.
 
