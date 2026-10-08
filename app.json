@@ -1,10 +1,13 @@
 {
   "expo": {
-    "name": "gym-track",
-    "slug": "gym-track",
+    "name": "fran-gym",
+    "slug": "fran-gym",
     "version": "1.0.0",
-    "scheme": "gym-track",
-    "platforms": ["ios", "android"],
+    "scheme": "fran-gym",
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -32,11 +35,14 @@
     "orientation": "portrait",
     "icon": "./src/assets/icon.png",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.vgarciadev.frangym",
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -45,7 +51,7 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f3a5641d-69fd-431f-a580-4c154be97412"
+        "projectId": "5e8d2d42-c50d-4a45-98b2-4106a8347386"
       }
     },
     "owner": "vgarcia_mistral",
@@ -54,7 +60,7 @@
     },
     "updates": {
       "checkAutomatically": "NEVER",
-      "url": "https://u.expo.dev/f3a5641d-69fd-431f-a580-4c154be97412"
+      "url": "https://u.expo.dev/5e8d2d42-c50d-4a45-98b2-4106a8347386"
     }
   }
 }
