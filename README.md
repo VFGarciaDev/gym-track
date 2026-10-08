@@ -1,3 +1,3 @@
-# gym-track
+# fran-gym
 
 Mobile app for tracking workouts, exercises, weights, and gym progress.
