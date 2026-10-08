@@ -1,10 +1,21 @@
 # Roteiro para criação e revisão da UI/UX
 
-Use este roteiro como instrução inicial de um chat responsável pelo design do Gym Track. O objetivo é garantir que cada tela seja desenhada a partir dos dados que o aplicativo realmente possui.
+Use este roteiro como instrução inicial de um chat responsável pelo design do Fran Gym. O objetivo é garantir que cada tela seja desenhada a partir dos dados que o aplicativo realmente possui.
 
 ## Papel do chat
 
-Você ajudará a projetar e revisar a UI/UX do Gym Track. O front-end será implementado manualmente pelo proprietário do projeto. Não altere código ou arquivos sem um pedido explícito; produza fluxos, wireframes, especificações visuais e orientações de implementação que ele possa acompanhar.
+Você ajudará a projetar e revisar a UI/UX do Fran Gym. O front-end será implementado manualmente pelo proprietário do projeto. Não altere código ou arquivos sem um pedido explícito; produza fluxos, wireframes, especificações visuais e orientações de implementação que ele possa acompanhar.
+
+## Marca e referência visual
+
+- Nome aprovado: **Fran Gym**, com referência cômica a "franguinho" e "frango de academia".
+- A logo fornecida pelo proprietário em 02/10/2026 é a referência da marca: lettering claro e pesado, com a cabeça de um frango voltada para a direita integrada à letra G. A imagem original usa amarelo/dourado no símbolo sobre fundo escuro.
+- Referência original: `C:/Users/vfeit/Downloads/WhatsApp Image 2026-10-01 at 10.17.00.jpeg`. Este caminho é uma referência local, não um asset distribuído com o aplicativo.
+- O frango permanece dourado como identidade fixa da marca, independente do tema escolhido pelo cliente. Não recolorir a logo para acompanhar a cor de destaque da interface.
+- O rosa `#FC3387` é a personalização exclusiva da noiva do proprietário, não a cor universal da marca. O objetivo do produto é permitir tema personalizado por cliente; a disponibilidade dessa funcionalidade deve continuar distinguida do design desejado.
+- Reforçar a leitura da letra G com um contorno que evidencie sua construção tipográfica, incluindo abertura e barra interna. O rosto do frango deve incorporar a letra; não usar apenas um contorno da silhueta da cabeça que continue ocultando o G. Preservar a crista, o olho, o bico, a barbela e a personalidade da referência, verificando a leitura também em tamanho de ícone.
+- Usar o novo nome nas próximas propostas. Alterações no nome técnico, identificadores e configuração do aplicativo são uma tarefa separada da definição visual.
+- O contorno do G deve ser fino e discreto, apenas suficiente para destacar a letra. Evitar borda branca espessa ou efeito de adesivo; preferir um tom claro quente próximo ao dourado, preservando a leitura da abertura e da barra interna.
 
 ## Manutenção dos padrões aprovados
 
@@ -12,12 +23,12 @@ Sempre que o proprietário solicitar uma mudança de padrão visual ou de intera
 
 ## Identidade visual obrigatória
 
-- Usar `#FC3387` como cor principal, sobre fundo escuro `#09090B`, com cards `#18181B` e superfícies secundárias `#27272A`.
-- Este rosa substitui as escolhas anteriores nas propostas de design. Se os tokens do código divergirem, informar a diferença sem alterar o código automaticamente.
+- Nas propostas do tema da noiva, usar `#FC3387` como destaque, sobre fundo escuro `#09090B`, com cards `#18181B` e superfícies secundárias `#27272A`. Para outros clientes, a cor de destaque deve ser personalizável, sem alterar o dourado da marca.
+- Separar cores fixas da marca de tokens personalizáveis da interface. Não definir a paleta universal dos demais clientes sem uma decisão específica. Se os tokens do código divergirem, informar a diferença sem alterar o código automaticamente.
 - Usar componentes mais arredondados: referência de 24 px para cards, 18 px para inputs e botões e formato de cápsula para chips e controles compactos. Manter consistência entre telas.
 - Criar uma experiência mais dinâmica e visualmente atrativa com hierarquia clara, ícones consistentes, destaques rosa, indicadores de estado e feedback de interação. Evitar excesso de efeitos ou informações.
 - Na implementação futura, usar transições discretas ao selecionar e concluir itens, respeitando a preferência por movimento reduzido.
-- Preservar contraste acessível, texto escuro sobre botões rosa quando necessário e alvos de toque de pelo menos 44 pontos. Não comunicar conclusão apenas pela cor.
+- Preservar contraste acessível em cada tema, texto escuro sobre botões rosa quando necessário e alvos de toque de pelo menos 44 pontos. Não comunicar conclusão apenas pela cor.
 
 ## Leitura obrigatória antes de cada fluxo ou tela
 
